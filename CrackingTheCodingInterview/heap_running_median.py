@@ -1,28 +1,64 @@
 #!/bin/python3
 
-from heapq import *
-import sys
+# FAILS TCs #1, 3, 4, 6, 8, 9
 
-def get_median(h):
-    if len(h) < 1:
-        return 0
+from heapq import heappush, heappop
 
-    if len(h) % 2 == 0:
-        mid_indices = ((len(h) / 2) - 1, len(h) / 2)
-    else:
-        mid_indices = (len(h) / 2)
+class MidHeap:
+    def __init__(self):
+        self.min_heap = []
+        self.max_heap = []
     
-    return sum(h[idx] for idx in mid_indices) / len(mid_indices)
+    def __len__(self):
+        return len(self.min_heap) + len(self.max_heap)
 
-heap = heapify([])
+    @property
+    def lower_median(self):
+        return -1.0 * self.min_heap[0]
+    
+    @property
+    def upper_median(self):
+        return 1.0 * self.max_heap[0]
+    
+    def append(self, value):
+        if len(self) > 1:
+            if value <= self.lower_median:
+                heappush(self.min_heap, -1 * value)
+            else:
+                heappush(self.max_heap, value)
+        elif len(self.min_heap) == 1 and len(self.max_heap) == 0:
+            self.max_heap.append(value)
+        else:
+            # min heap has nothing or both have nothing.
+            # arbitrarily append to the min heap.
+            self.min_heap.append(-1.0 * value)
+            
+        if len(self.min_heap) - len(self.max_heap) > 1:
+            heappush(self.max_heap, -1.0 * heappop(self.min_heap))
+        if len(self.max_heap) - len(self.min_heap) > 1:
+            heappush(self.min_heap, -1.0 * heappop(self.max_heap))
+    
+    @property
+    def median(self):
+        if len(self.min_heap) > len(self.max_heap):
+            return self.lower_median
+        elif len(self.min_heap) < len(self.max_heap):
+            return self.upper_median
+        else:
+            return (self.lower_median + self.upper_median) / 2
+        
+    def __repr__(self):
+        return '<MidHeap Min={}, Max={}>'.format(self.min_heap, self.max_heap)
+
+heap = MidHeap()
 
 n = int(input().strip())
 a = []
 a_i = 0
 for a_i in range(n):
    a_t = int(input().strip())
-   heappush(heap, a_t)
-   print(get_median(heap))
+   heap.append(a_t)
+   print(heap.median)
 
 
 
