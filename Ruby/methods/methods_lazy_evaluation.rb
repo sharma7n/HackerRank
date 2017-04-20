@@ -1,6 +1,3 @@
-# Does not yet pass TC #3 (timeout)
-
-
 # Enter your code here. Read input from STDIN. Print output to STDOUT
 require 'set'
 
@@ -13,9 +10,8 @@ def is_prime?(k)
     elsif $primes.include? k
         true
     else
-        $primes
+        (2..Math.sqrt(k))
             .lazy
-            .take_while { |j| j <= Math.sqrt(k) } 
             .each do |i|
             if k % i == 0
                 return false
@@ -34,6 +30,6 @@ end
 print 1
     .upto(Float::INFINITY)
     .lazy
-    .select { |a| is_prime? a }
-    .select { |b| is_palindrome? b }
+    .select { |a| is_palindrome? a }
+    .select { |b| is_prime? b }
     .first(n)
